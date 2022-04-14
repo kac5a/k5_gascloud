@@ -2,11 +2,13 @@ ESX = nil
 
 local safeZoneCoords2d = vector2(Config.SafeZone.center[1], Config.SafeZone.center[2])
 local isInRing = false
+local distance = 0
 local hasMask = false
 local maskCapacity = 0
 local currentMask = nil
 local cloudStrength = 0.0
 local originalMask = {}
+local safeZoneSize = Config.SafeZone.size * 2 * 0.9905
 
 Citizen.CreateThread(function()
     while ESX == nil do
@@ -31,17 +33,17 @@ end)
 -- Determinate if the player is in the area
 Citizen.CreateThread(function()
     while true do
-        local sleep = 1000
         local playerCoords = GetEntityCoords(PlayerPedId())
         local playerCoords2d = vector2(playerCoords[1], playerCoords[2])
+        distance = #(playerCoords2d - safeZoneCoords2d)
 
-        if #(playerCoords2d - safeZoneCoords2d) > Config.SafeZone.size and GetEntityHealth(PlayerPedId()) > 0 then
+        if distance > Config.SafeZone.size and GetEntityHealth(PlayerPedId()) > 0 then
             isInRing = true
         else
             isInRing = false
         end
 
-        Citizen.Wait(sleep)
+        Citizen.Wait(1000)
     end
 end)
 
@@ -91,15 +93,34 @@ Citizen.CreateThread(function()
     end
 end)
 
--- Gas marker and mask remove keypress check
+-- Mask remove keypress check
 Citizen.CreateThread(function()
     while true do
-        if IsControlJustReleased(0, 244) and hasMask then
-            RemoveMask()
+        local sleep = 1000
+        if hasMask then
+            sleep = 1
+            if IsControlJustReleased(0, 244) then
+                RemoveMask()
+            end
         end
+        Citizen.Wait(sleep)
+    end
+end)
 
-        DrawMarker(1, Config.SafeZone.center, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Config.SafeZone.size * 2 * 0.9905, Config.SafeZone.size * 2 * 0.9905, 600.0, Config.SafeZone.markerColor['r'], Config.SafeZone.markerColor['g'], Config.SafeZone.markerColor['b'], Config.SafeZone.markerColor['a'], false, true, 2, false, nil, nil, false)
-        Citizen.Wait(1)
+-- Gas marker
+Citizen.CreateThread(function()
+    while true do
+        local sleep = 1000
+        if Config.AlwaysShowCloud then
+            sleep = 1
+            DrawMarker(1, Config.SafeZone.center, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, safeZoneSize, safeZoneSize, 600.0, Config.SafeZone.markerColor['r'], Config.SafeZone.markerColor['g'], Config.SafeZone.markerColor['b'], Config.SafeZone.markerColor['a'], false, true, 2, false, nil, nil, false)
+        else
+            if (Config.SafeZone.size - distance) < Config.ShowCloudDistance then
+                sleep = 1
+                DrawMarker(1, Config.SafeZone.center, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, safeZoneSize, safeZoneSize, 600.0, Config.SafeZone.markerColor['r'], Config.SafeZone.markerColor['g'], Config.SafeZone.markerColor['b'], Config.SafeZone.markerColor['a'], false, true, 2, false, nil, nil, false)
+            end
+        end
+        Citizen.Wait(sleep)
     end
 end)
 

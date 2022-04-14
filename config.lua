@@ -3,6 +3,9 @@ Locale = {}
 
 Config.RemoveMaskKey = 244 --"M" by default
 
+Config.AlwaysShowCloud = true -- If you want to hide the cloud marker when the player is far from it, set this to true. Turn this off if you want to improve performance.
+Config.ShowCloudDistance = 100 -- If "Config.AlwaysShowCloud" is true, this is the distance the cloud will be visible from
+
 -------------------------------------------------
 -------- Safe Zone and circle properties --------
 -------------------------------------------------
