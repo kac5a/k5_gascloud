@@ -22,7 +22,7 @@ To use this script, you need to edit the configuration to fit your needs.
 
 ```
 cd resources
-git clone https://github.com/kac5a/k5_gascloud [scripts]/k5_gascloud
+git clone https://github.com/kac5a/k5_gascloud.git [scripts]/k5_gascloud
 ```
 
 ### Manually
